@@ -32,6 +32,7 @@ if (Meteor.isServer) {
 	        lightbox_url: "www.caninecola.com",
 	        is_published: false
 	    });
+
 	    Cards.insert({
 	    	is_ad: false,
 	    	is_content: true,

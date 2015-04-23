@@ -1,9 +1,9 @@
 <template name="list">
-	hey
     <div class="list" id='L{{ _id }}'>
         <h2>{{ name }}</h2>
         <ul id="{{ _id }}">
         {{#each getCards is_published }}
+        	this is a card
             {{> card }}
         {{/each }}
         </ul>

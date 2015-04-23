@@ -2,20 +2,17 @@ Meteor.subscribe('cards');
 Meteor.subscribe('lists');
 Meteor.subscribe('statistics');
 
-if (Meteor.isClient) {
-
   console.log(Date.now());
 
-  Template.list.getCards = function(isPublished) {
-    console.log("getting cards")
+  Template.list.getCards = function() {
     return Cards.find(
-      { is_published: isPublished}
-    )
-  }
+      {}
+    );
+  };
 
-  Template.board.helpers({
-    lists: Lists.find({}, {sort: {order: 1}})
-  });
+  Template.board.getLists = function(){
+    return Lists.find({}, {sort: {order: 1}})
+  };
 
   Template.login.events({
     'click #facebook-login': function(event) {
@@ -34,4 +31,3 @@ if (Meteor.isClient) {
         })
     }
   });
-}
