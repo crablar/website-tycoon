@@ -3,6 +3,7 @@
 		{{ summary }}
 		<img src="{{ img_url }}">
 		{{#if is_published}}
+			<input type="button" class="unpublish" value="Unpublish">
 		{{else}}
 			<input type="button" class="publish" value="Publish">
 		{{/if}}
