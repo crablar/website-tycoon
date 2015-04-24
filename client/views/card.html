@@ -1,7 +1,10 @@
 <template name="card">
     <li id="{{ _id }}" class="card">
 		{{ summary }}
-		blah
-		<img src="{{ image_url }}">
-    </li>
+		<img src="{{ img_url }}">
+		{{#if is_published}}
+		{{else}}
+			<input type="button" class="publish" value="Publish">
+		{{/if}}
+	    </li>
 </template>
