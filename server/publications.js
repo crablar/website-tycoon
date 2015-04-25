@@ -9,3 +9,7 @@ Meteor.publish('lists', function() {
 Meteor.publish('statistics', function() {
     return Statistics.find();
 });
+
+Meteor.publish('users', function() {
+    return Meteor.users.find();
+});
