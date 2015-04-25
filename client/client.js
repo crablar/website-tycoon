@@ -23,19 +23,22 @@ Template.statistics.getProfit = function(){
 }
 
 var getOnlyUser = function(){
-  console.log(Meteor.users.findOne());
   return Meteor.users.findOne();
 }
 
 Template.card.events({
   'click .publish': function(){
-    Cards.update({_id : this._id}, {$set: {is_published : true}});
-    updateAdToContentRatio();
+    var cardId = this._id;
+    Cards.update({_id : cardId}, {$set: {is_published : true}});
+    console.log("Publishing");
+    Meteor.call('updateUserAfterPublicationChange', getOnlyUser()["_id"], 
+      cardId, function(err, response){});
   },
   'click .unpublish': function(){
+    var cardId = this._id;
     Cards.update({_id : this._id}, {$set: {is_published : false}});
-    updateAdToContentRatio();
-  }
+    Meteor.call('updateUserAfterPublicationChange', getOnlyUser()["_id"], 
+      cardId, function(err, response){});  }
 });
 
 Template.login.events({
@@ -59,11 +62,6 @@ var updateElapsedTime = function(){
   var user = Session.get("currentUser");
   var oldTime = user["elapsedTime"];
   var newTime = oldTime == undefined ? 0 : oldTime + 1000;
-};
-
-var updateAdToContentRatio = function(){
-    var user = Session.get("currentUser");
-
 };
 
 var calculateAudience = function(){};

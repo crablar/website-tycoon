@@ -18,13 +18,64 @@ Meteor.startup(function(){
 		      "time_elapsed": 0
 		    };
 		  Meteor.users.update({_id : user["_id"]}, {$set : {"statistics" : defaultStatistics}});		  console.log("update!!!!");
+		},
+		updateUserAfterPublicationChange : function(userId, cardId){
+			var card = Cards.findOne({_id : cardId});
+			var cardIsNowPublished = card["is_published"];
+			var cardIsAd = card["is_ad"];
+			var cardIsContent = card["is_content"];
+			console.log(cardIsNowPublished + " " + cardIsAd + " " + cardIsContent);
+			
+			if(cardIsNowPublished){
+				if(cardIsAd && cardIsContent){
+					console.log("editing sponsored content");
+					Meteor.users.update({_id : userId}, 
+						{$inc :{"statistics.num_published_content" : 1, "statistics.num_published_ads" : 1}});
+				}
+				if(cardIsAd && !cardIsContent){
+					Meteor.users.update({_id : userId}, 
+						{$inc :{"statistics.num_published_ads" : 1}});
+				}
+				if(!cardIsAd && cardIsContent){
+					Meteor.users.update({_id : userId}, 
+						{$inc :{"statistics.num_published_content" : 1}});
+				}
+			}
+
+			else{
+				console.log("unpublishing something...");
+				if(cardIsAd && cardIsContent){
+					console.log("updating sponsored content to decrease publication");
+					Meteor.users.update({_id : userId}, 
+						{$inc :{"statistics.num_published_content" : -1, "statistics.num_published_ads" : -1}});
+				}
+				if(cardIsAd && !cardIsContent){
+					Meteor.users.update({_id : userId}, 
+						{$inc :{"statistics.num_published_ads" : -1}});
+				}
+				if(!cardIsAd && cardIsContent){
+					Meteor.users.update({_id : userId}, 
+						{$inc :{"statistics.num_published_content" : -1}});
+				}
+			}
+
+			var previousAdToContentRatio = Meteor.users.findOne({_id : userId})["statistics"]["ad_to_content_ratio"];
+			var numPublishedAds = Meteor.users.findOne({_id : userId})["statistics"]["num_published_ads"];
+			var numPublishedContent = Meteor.users.findOne({_id : userId})["statistics"]["num_published_content"];
+			var newAdToContentRatio = numPublishedContent == 0
+				? numPublishedAds : numPublishedAds / numPublishedContent;
+			Meteor.users.update({_id : userId}, 
+				{$set :{"statistics.ad_to_content_ratio" : newAdToContentRatio}});
+			Meteor.users.update({_id : userId}, 
+				{$set :{"statistics.previous_ad_to_content_ratio" : previousAdToContentRatio}});
+				
 		}
 	});
 });
 
 if(!Cards.findOne()){	
 	console.log('resetting everything');
-	// Remove every element in the db, then seed it
+	// Remove every element in the Meteor, then seed it
 	Meteor.startup(function () {
 	    var globalObject=Meteor.isClient?window:global;
 	    for(var property in globalObject){
@@ -72,6 +123,8 @@ if(!Cards.findOne()){
 	        lightbox_url: "www.sprite.com",
 	        is_published: false
 	    });
+
+	    //Sponsored content!
 	    Cards.insert({
 	    	is_ad: true,
 	    	is_content: true,
