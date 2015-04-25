@@ -11,36 +11,21 @@ Template.board.getLists = function(){
   return Lists.find({}, {sort: {order: 1}})
 };
 
-Template.board.getStatistics = function(){
+Template.statistics.initializeStatistics = function(){
   var user = getOnlyUser();
   if(user && !user["statistics"]){
-    initializeStatistics(user);
-  }
+    Meteor.call('initializeStatistics', user, function(err, response){});
+  };
+};
+
+Template.statistics.getProfit = function(){
+  return getOnlyUser()["statistics"]["net_profit"];
 }
 
 var getOnlyUser = function(){
+  console.log(Meteor.users.findOne());
   return Meteor.users.findOne();
 }
-
-var initializeStatistics = function(user){
-  console.log("USER" + user["_id"]);
-  var defaultStatistics = 
-    {
-      "net_profit": 0,
-      "ad_revenue": 0,
-      "num_published_ads": 0,
-      "num_published_content": 0,
-      "audience_size": 0,
-      "previous_ad_to_content_ratio": 0,
-      "ad_to_content_ratio": 1,
-      "server_costs": 0,
-      "account_created_at": 0,
-      "time_elapsed": 0
-    };
-  console.log(Meteor.users.find({"_id" : user["_id"]}));
-  Meteor.users.update({_id : user["_id"]}, {$set : {"statistics" : defaultStatistics}});
-  console.log("update!!!!");
-};
 
 Template.card.events({
   'click .publish': function(){
