@@ -4,7 +4,9 @@ Meteor.subscribe('statistics');
 Meteor.subscribe('users');
 
 Template.list.getCards = function(isListPublished) {
-  return Cards.find({is_published : isListPublished});
+  var elapsedTime = getOnlyUser()["statistics"]["time_elapsed"];
+  console.log(elapsedTime);
+  return Cards.find({is_published : isListPublished, 'visible_after' : {$lte : elapsedTime}}, {sort : {visible_after : -1}});
 };
 
 Template.board.getLists = function(){
@@ -20,6 +22,18 @@ Template.statistics.initializeStatistics = function(){
 
 Template.statistics.getProfit = function(){
   return getOnlyUser()["statistics"]["net_profit"];
+}
+
+Template.statistics.getAudience = function(){
+  return getOnlyUser()["statistics"]["audience_size"];
+}
+
+Template.statistics.getServerCosts = function(){
+  return getOnlyUser()["statistics"]["server_costs"];
+}
+
+Template.statistics.getAdRevenue = function(){
+  return getOnlyUser()["statistics"]["ad_revenue"];
 }
 
 var getOnlyUser = function(){
@@ -59,15 +73,24 @@ Template.login.events({
 });
 
 var updateElapsedTime = function(){
-  var user = Session.get("currentUser");
-  var oldTime = user["elapsedTime"];
-  var newTime = oldTime == undefined ? 0 : oldTime + 1000;
+  Meteor.call('updateUserElapsedTime', getOnlyUser()["_id"], function(err, response){});
 };
 
-var calculateAudience = function(){};
-var calculateServerCosts = function(){};
-var calculateAdRevenue = function(){};
-var calculateNetProfit = function(){};
+var calculateAudience = function(){
+  Meteor.call('updateUserAudience', getOnlyUser(), function(err, response){});
+};
+
+var calculateServerCosts = function(){
+  Meteor.call('updateUserServerCosts', getOnlyUser(), function(err, response){});
+};
+
+var calculateAdRevenue = function(){
+  Meteor.call('updateUserAdRevenue', getOnlyUser(), function(err, response){});
+};
+
+var calculateNetProfit = function(){
+  Meteor.call('updateUserNetProfit', getOnlyUser(), function(err, response){});
+};
 
 var gameLoop = function(){
   updateElapsedTime();
@@ -76,3 +99,5 @@ var gameLoop = function(){
   calculateAdRevenue();
   calculateNetProfit();
 }
+
+setInterval(gameLoop, 1000);
