@@ -3,38 +3,40 @@ Meteor.subscribe('lists');
 Meteor.subscribe('statistics');
 Meteor.subscribe('users');
 
-Template.list.getCards = function(isListPublished) {
-  var elapsedTime = getOnlyUser()["statistics"]["time_elapsed"];
-  console.log(elapsedTime);
-  return Cards.find({is_published : isListPublished, 'visible_after' : {$lte : elapsedTime}}, {sort : {visible_after : -1}});
-};
+Template.list.helpers({
+  getCards : function(isListPublished) {
+    var elapsedTime = getOnlyUser()["statistics"]["time_elapsed"];
+    console.log(elapsedTime);
+    return Cards.find({is_published : isListPublished, 'visible_after' : {$lte : elapsedTime}}, {sort : {visible_after : -1}});
+  }
+});
 
-Template.board.getLists = function(){
-  return Lists.find({}, {sort: {order: 1}})
-};
+Template.board.helpers({
+  getLists : function(){
+    return Lists.find({}, {sort: {order: 1}})
+  }
+});
 
-Template.statistics.initializeStatistics = function(){
-  var user = getOnlyUser();
-  if(user && !user["statistics"]){
-    Meteor.call('initializeStatistics', user, function(err, response){});
-  };
-};
-
-Template.statistics.getProfit = function(){
-  return getOnlyUser()["statistics"]["net_profit"];
-}
-
-Template.statistics.getAudience = function(){
-  return getOnlyUser()["statistics"]["audience_size"];
-}
-
-Template.statistics.getServerCosts = function(){
-  return getOnlyUser()["statistics"]["server_costs"];
-}
-
-Template.statistics.getAdRevenue = function(){
-  return getOnlyUser()["statistics"]["ad_revenue"];
-}
+Template.statistics.helpers({ 
+  initializeStatistics : function(){
+    var user = getOnlyUser();
+    if(user && !user["statistics"]){
+      Meteor.call('initializeStatistics', user, function(err, response){});
+    };
+  },
+  getProfit : function(){
+    return getOnlyUser()["statistics"]["net_profit"];
+  },
+  getAudience : function(){
+    return getOnlyUser()["statistics"]["audience_size"];
+  },
+  getServerCosts : function(){
+    return getOnlyUser()["statistics"]["server_costs"];
+  },
+  getAdRevenue : function(){
+    return getOnlyUser()["statistics"]["ad_revenue"];
+  }
+});
 
 var getOnlyUser = function(){
   return Meteor.users.findOne();
