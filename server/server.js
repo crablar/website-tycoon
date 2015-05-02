@@ -28,7 +28,7 @@ Meteor.startup(function(){
 			
 			if(cardIsNowPublished){
 				if(cardIsAd && cardIsContent){
-					console.log("editing sponsored content");
+					console.log("Editing sponsored content");
 					Meteor.users.update({_id : userId}, 
 						{$inc :{"statistics.num_published_content" : 1, "statistics.num_published_ads" : 1}});
 				}
@@ -43,7 +43,7 @@ Meteor.startup(function(){
 			}
 
 			else{
-				console.log("unpublishing something...");
+				console.log("Unpublishing something...");
 				if(cardIsAd && cardIsContent){
 					console.log("updating sponsored content to decrease publication");
 					Meteor.users.update({_id : userId}, 
@@ -70,22 +70,37 @@ Meteor.startup(function(){
 				{$set :{"statistics.previous_ad_to_content_ratio" : previousAdToContentRatio}});
 				
 		},
-		updateUserElapsedTime : function(userId) {
-			Meteor.users.update({_id : userId}, 
+		updateUserElapsedTime : function(user) {
+			console.log("updating elapsed time");
+			if(!user || !user["statistics"]){
+				console.log("Error: user is " + user + " and statistics is " + statistics);
+				return;
+			}
+			Meteor.users.update({_id : user["_id"]}, 
 				{$inc :{"statistics.time_elapsed" : 1}});
 				
 		},
 		updateUserAudience : function(user) {
+			if(!user || !user["statistics"]){
+				console.log("Error: user is " + user + " and statistics is " + statistics);
+				return;
+			}
+			console.log("updating audience");
 			var oldAudience = user["statistics"]["audience_size"];
+			console.log("old audience: " + oldAudience); 
 			var adToContentRatio = user["statistics"]["ad_to_content_ratio"];
 			var previousAdToContentRatio = user["statistics"]["previous_ad_to_content_ratio"];
-			console.log("STUFF " + oldAudience + " " + adToContentRatio + " " + previousAdToContentRatio);
 			var newAudience = Math.floor(oldAudience * (previousAdToContentRatio - adToContentRatio));
-			newAudience = newAudience == 0 ? 1 : newAudience;
+			newAudience = newAudience <= 0 ? 1 : newAudience;
+			console.log("new audience: " + newAudience);
 			Meteor.users.update({_id : user["_id"]}, 
 				{$inc :{"statistics.audience_size" : newAudience}});
 		},
 		updateUserServerCosts : function(user) {
+			if(!user || !user["statistics"]){
+				console.log("Error: user is " + user + " and statistics is " + statistics);
+				return;
+			}
 			var audience = user["statistics"]["audience_size"];
 			var numPublications = user["statistics"]["num_published_ads"] 
 				+ user["statistics"]["num_published_content"];
@@ -94,6 +109,10 @@ Meteor.startup(function(){
 				{$inc :{"statistics.server_costs" : additionalCosts}});
 		},
 		updateUserAdRevenue : function(user) {
+			if(!user || !user["statistics"]){
+				console.log("Error: user is " + user + " and statistics is " + statistics);
+				return;
+			}
 			var audience = user["statistics"]["audience_size"];
 			var numAds = user["statistics"]["num_published_ads"];
 			var additionalRevenue = audience * numAds;
@@ -101,6 +120,10 @@ Meteor.startup(function(){
 				{$inc :{"statistics.ad_revenue" : additionalRevenue}});
 		},
 		updateUserNetProfit : function(user) {
+			if(!user || !user["statistics"]){
+				console.log("Error: user is " + user + " and statistics is " + statistics);
+				return;
+			}
 			var adRevenue = user["statistics"]["ad_revenue"];
 			var serverCosts = user["statistics"]["server_costs"];
 			var newProfit = adRevenue - serverCosts;

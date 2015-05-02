@@ -2,7 +2,6 @@
     <div class="list" id='L{{ _id }}'>
         <h2>{{ name }}</h2>
         <ul id="{{ _id }}">
-        	{{is_published}}
         {{#each getCards is_published }}
             {{> card }}
         {{/each }}

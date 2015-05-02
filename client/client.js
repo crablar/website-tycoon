@@ -5,7 +5,12 @@ Meteor.subscribe('users');
 
 Template.list.helpers({
   getCards : function(isListPublished) {
-    var elapsedTime = getOnlyUser()["statistics"]["time_elapsed"];
+    user = getCurrentUser();
+    if(!user || !user["statistics"]){
+      console.log("Error: user is " + user);
+      return;
+    }
+    var elapsedTime = user["statistics"]["time_elapsed"];
     console.log(elapsedTime);
     return Cards.find({is_published : isListPublished, 'visible_after' : {$lte : elapsedTime}}, {sort : {visible_after : -1}});
   }
@@ -19,43 +24,75 @@ Template.board.helpers({
 
 Template.statistics.helpers({ 
   initializeStatistics : function(){
-    var user = getOnlyUser();
+    user = getCurrentUser();
+    if(!user){
+      console.log("Error: user is " + user);
+      return;
+    }
     if(user && !user["statistics"]){
+      console.log("initializing statistics");
       Meteor.call('initializeStatistics', user, function(err, response){});
     };
   },
   getProfit : function(){
-    return getOnlyUser()["statistics"]["net_profit"];
+    user = getCurrentUser();
+    if(!user || !user["statistics"]){
+      console.log("Error: user is " + user);
+      return;
+    }
+    console.log(user["statistics"]);
+    return user["statistics"]["net_profit"];
   },
   getAudience : function(){
-    return getOnlyUser()["statistics"]["audience_size"];
+    user = getCurrentUser();
+    if(!user || !user["statistics"]){
+      console.log("Error: user is " + user);
+      return;
+    }
+    return user["statistics"]["audience_size"];
   },
   getServerCosts : function(){
-    return getOnlyUser()["statistics"]["server_costs"];
+    user = getCurrentUser();
+    if(!user || !user["statistics"]){
+      console.log("Error: user is " + user);
+      return;
+    }
+    return user["statistics"]["server_costs"];
   },
   getAdRevenue : function(){
-    return getOnlyUser()["statistics"]["ad_revenue"];
+    user = getCurrentUser();
+    if(!user || !user["statistics"]){
+      console.log("Error: user is " + user);
+      return;
+    }
+    return user["statistics"]["ad_revenue"];
   }
 });
 
-var getOnlyUser = function(){
-  return Meteor.users.findOne();
+var getCurrentUser = function(){
+  var currentUser = Session.get("currentUser");
+  return currentUser;
 }
 
 Template.card.events({
   'click .publish': function(){
     var cardId = this._id;
     Cards.update({_id : cardId}, {$set: {is_published : true}});
-    console.log("Publishing");
-    Meteor.call('updateUserAfterPublicationChange', getOnlyUser()["_id"], 
+    Meteor.call('updateUserAfterPublicationChange', getCurrentUser()["_id"], 
       cardId, function(err, response){});
   },
   'click .unpublish': function(){
     var cardId = this._id;
     Cards.update({_id : this._id}, {$set: {is_published : false}});
-    Meteor.call('updateUserAfterPublicationChange', getOnlyUser()["_id"], 
+    Meteor.call('updateUserAfterPublicationChange', getCurrentUser()["_id"], 
       cardId, function(err, response){});  }
 });
+
+Template.login.helpers({
+  setSessionUser : function(currentUser){
+    Session.set({"currentUser" : currentUser});
+  }
+})
 
 Template.login.events({
   'click #facebook-login': function(event) {
@@ -66,6 +103,7 @@ Template.login.events({
       });
   },
   'click #logout': function(event) {
+    Session.set({"currentUser" : undefined});
       Meteor.logout(function(err){
           if (err) {
               throw new Meteor.Error("Logout failed");
@@ -75,23 +113,23 @@ Template.login.events({
 });
 
 var updateElapsedTime = function(){
-  Meteor.call('updateUserElapsedTime', getOnlyUser()["_id"], function(err, response){});
+  Meteor.call('updateUserElapsedTime', getCurrentUser(), function(err, response){});
 };
 
 var calculateAudience = function(){
-  Meteor.call('updateUserAudience', getOnlyUser(), function(err, response){});
+  Meteor.call('updateUserAudience', getCurrentUser(), function(err, response){});
 };
 
 var calculateServerCosts = function(){
-  Meteor.call('updateUserServerCosts', getOnlyUser(), function(err, response){});
+  Meteor.call('updateUserServerCosts', getCurrentUser(), function(err, response){});
 };
 
 var calculateAdRevenue = function(){
-  Meteor.call('updateUserAdRevenue', getOnlyUser(), function(err, response){});
+  Meteor.call('updateUserAdRevenue', getCurrentUser(), function(err, response){});
 };
 
 var calculateNetProfit = function(){
-  Meteor.call('updateUserNetProfit', getOnlyUser(), function(err, response){});
+  Meteor.call('updateUserNetProfit', getCurrentUser(), function(err, response){});
 };
 
 var gameLoop = function(){
