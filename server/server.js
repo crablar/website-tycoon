@@ -17,7 +17,9 @@ Meteor.startup(function(){
 		      "account_created_at": 0,
 		      "time_elapsed": 0
 		    };
-		  Meteor.users.update({_id : user["_id"]}, {$set : {"statistics" : defaultStatistics}});		  console.log("update!!!!");
+		  Meteor.users.update({_id : user["_id"]}, {$set : {"statistics" : defaultStatistics}});
+		  Meteor.users.update({_id : user["_id"]}, {$set : {"published_cards" : []}});
+		  Meteor.users.update({_id : user["_id"]}, {$set : {"unpublished_cards" : []}});
 		},
 		updateUserAfterPublicationChange : function(userId, cardId){
 			var card = Cards.findOne({_id : cardId});
@@ -27,33 +29,34 @@ Meteor.startup(function(){
 			console.log(cardIsNowPublished + " " + cardIsAd + " " + cardIsContent);
 			
 			if(cardIsNowPublished){
+				Meteor.users.update({_id :userId}, {$pull: {unpublished_cards : cardId}});
+				Meteor.users.update({_id :userId}, {$push: {published_cards : cardId}});
 				if(cardIsAd && cardIsContent){
-					console.log("Editing sponsored content");
 					Meteor.users.update({_id : userId}, 
 						{$inc :{"statistics.num_published_content" : 1, "statistics.num_published_ads" : 1}});
 				}
-				if(cardIsAd && !cardIsContent){
+				else if(cardIsAd && !cardIsContent){
 					Meteor.users.update({_id : userId}, 
 						{$inc :{"statistics.num_published_ads" : 1}});
 				}
-				if(!cardIsAd && cardIsContent){
+				else if(!cardIsAd && cardIsContent){
 					Meteor.users.update({_id : userId}, 
 						{$inc :{"statistics.num_published_content" : 1}});
 				}
 			}
 
 			else{
-				console.log("Unpublishing something...");
+				Meteor.users.update({_id :userId}, {$pull: {published_cards : cardId}});
+				Meteor.users.update({_id :userId}, {$push: {unpublished_cards : cardId}});
 				if(cardIsAd && cardIsContent){
-					console.log("updating sponsored content to decrease publication");
 					Meteor.users.update({_id : userId}, 
 						{$inc :{"statistics.num_published_content" : -1, "statistics.num_published_ads" : -1}});
 				}
-				if(cardIsAd && !cardIsContent){
+				else if(cardIsAd && !cardIsContent){
 					Meteor.users.update({_id : userId}, 
 						{$inc :{"statistics.num_published_ads" : -1}});
 				}
-				if(!cardIsAd && cardIsContent){
+				else if(!cardIsAd && cardIsContent){
 					Meteor.users.update({_id : userId}, 
 						{$inc :{"statistics.num_published_content" : -1}});
 				}
@@ -79,6 +82,14 @@ Meteor.startup(function(){
 			Meteor.users.update({_id : user["_id"]}, 
 				{$inc :{"statistics.time_elapsed" : 1}});
 				
+		},
+		updateUserVisibleCards : function(user) {
+			var userElapsedTime = user["statistics"]["time_elapsed"];
+			Cards.find({visible_after : userElapsedTime}).forEach(
+				function(card){
+					Meteor.users.update({"_id" : user["_id"]}, {$push : {unpublished_cards : card["_id"]}});
+				}
+			);
 		},
 		updateUserAudience : function(user) {
 			if(!user || !user["statistics"]){
@@ -151,6 +162,7 @@ if(deployedPrototype){
 	        is_published: false,
 	        order: 1
 	    });
+
 	    Lists.insert({
 	        name: 'Published',
 	        is_published: true,
@@ -164,7 +176,6 @@ if(deployedPrototype){
 	    	summary: "Canine Cola",
 	        img_url: "http://s3-us-west-2.amazonaws.com/creatad/creatives/images/000/000/010/original/canine-cola.png",
 	        lightbox_url: "www.caninecola.com",
-	        is_published: false,
 	        visible_after: 0
 	    });
 
@@ -174,16 +185,15 @@ if(deployedPrototype){
 	    	summary: "Conflict in Middle East",
 	        img_url: "http://cdn.emergingmoney.com/wp-content/uploads/2012/06/Insurgent_attack_Iraqi_oil_pipeline_near_Taji-300x214.jpg",
 	        lightbox_url: "www.cnn.com",
-	        is_published: false,
 	        visible_after: 0
 	    });
+
 	    Cards.insert({
 	    	is_ad: true,
 	    	is_content: false,
 	    	summary: "Sprite Cereal",
 	        img_url: "http://s3-us-west-2.amazonaws.com/creatad/creatives/images/000/000/006/original/spritecereal.jpg",
 	        lightbox_url: "www.sprite.com",
-	        is_published: false,
 	        visible_after: 0
 	    });
 
@@ -193,7 +203,6 @@ if(deployedPrototype){
 	    	summary: "You won't BELIEVE how this octopus looks up close.",
 	        img_url: "http://replicatedtypo.com/wp-content/uploads/2012/04/octopus.jpg",
 	        lightbox_url: "octopics.com",
-	        is_published: false,
 	        visible_after: 6
 	    });
 
@@ -203,7 +212,6 @@ if(deployedPrototype){
 	    	summary: "Study shows plastic healthier after being melted.",
 	        img_url: "http://seenheardknown.com/wp-content/uploads/2013/04/Dr-Marko-Lens-marko-lens-zelens-zelens-luxury-skincare-luxury-skincare-skin-ageing-skin-cancer-beauty-doctor-scientist-plastic-surgeon-reconstructive-surgeon-master-of-science-phd-melanoma.jpg",
 	        lightbox_url: "studiesshow.com",
-	        is_published: false,
 	        visible_after: 12
 	    });
 
@@ -213,7 +221,6 @@ if(deployedPrototype){
 	    	summary: "Kanye releases new line of soups including 'Kidney Bean Chili' and 'New England Clam Chowder'",
 	        img_url: "http://static.giantbomb.com/uploads/original/9/97934/1708690-kanye_west_estelle.jpg",
 	        lightbox_url: "shopify.com/kanyesoups",
-	        is_published: false,
 	        visible_after: 18
 	    });
 	    
@@ -223,7 +230,6 @@ if(deployedPrototype){
 	    	summary: "Does drone use cause obesity?",
 	        img_url: "http://bloximages.chicago2.vip.townnews.com/journaltimes.com/content/tncms/assets/v3/editorial/0/59/059dc082-89ee-509f-92c5-e6909aec968b/53ece23b9d554.preview-620.jpg",
 	        lightbox_url: "dronefacts.com",
-	        is_published: false,
 	        visible_after: 24
 	    });
 
@@ -233,7 +239,6 @@ if(deployedPrototype){
 	    	summary: "Hershey's presents: Plastic Sucrose Globs",
 	        img_url: "https://lh6.googleusercontent.com/-h6dbhU-v6-8/TW1dvII0nSI/AAAAAAAAABQ/jo9jqfJNGx0/s1600/tesla-and-the-bear.jpg",
 	        lightbox_url: "www.plasticsucrose.com",
-	        is_published: false,
 	        visible_after: 30
 	    });
 
@@ -243,7 +248,6 @@ if(deployedPrototype){
 	    	summary: "Fringe Middle Eastern cult growing in popularity.",
 	        img_url: "http://images.travelpod.com/tw_slides/ta00/9d1/82e/i-hasidic-jews-at-the-wailing-wall-hof-carmel.jpg",
 	        lightbox_url: "jcaa.com",
-	        is_published: false,
 	        visible_after: 36
 	    });
 
@@ -253,7 +257,6 @@ if(deployedPrototype){
 	    	summary: "Dropbox For Recipes",
 	        img_url: "http://s3-us-west-2.amazonaws.com/creatad/creatives/images/000/000/007/original/dropboxforrecipes.jpg",
 	        lightbox_url: "dropbox.com/recipe",
-	        is_published: false,
 	        visible_after: 42
 	    });
 
@@ -263,7 +266,6 @@ if(deployedPrototype){
 	    	summary: "Study shows males unaffected by female objectification.",
 	        img_url: "http://www.open-lims.org/tl_files/open-lims/images/photos/scientists_490.jpg",
 	        lightbox_url: "www.kanesic.com (article about strange, inconvenient wearable Kanye invents)",
-	        is_published: false,
 	        visible_after: 48
 	    });
 
@@ -273,7 +275,6 @@ if(deployedPrototype){
 	    	summary: "Kanye releases new music streaming device.",
 	        img_url: "http://worldtruth.tv/wp-content/uploads/2013/11/Kanye-West-362922-1-402.jpg",
 	        lightbox_url: "www.kanesic.com (article about strange, inconvenient wearable Kanye invents)",
-	        is_published: false,
 	        visible_after: 54
 	    });
 
@@ -283,7 +284,6 @@ if(deployedPrototype){
 	    	summary: "Rulers.com",
 	        img_url: "http://s3-us-west-2.amazonaws.com/creatad/creatives/images/000/000/003/original/rulers.jpg",
 	        lightbox_url: "Rulers.com",
-	        is_published: false,
 	        visible_after: 60
 	    });
 

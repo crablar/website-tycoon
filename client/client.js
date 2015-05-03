@@ -10,9 +10,8 @@ Template.list.helpers({
       console.log("Error: user is " + user);
       return;
     }
-    var elapsedTime = user["statistics"]["time_elapsed"];
-    console.log(elapsedTime);
-    return Cards.find({is_published : isListPublished, 'visible_after' : {$lte : elapsedTime}}, {sort : {visible_after : -1}});
+    var cardIds = isListPublished ? user["published_cards"] : user["unpublished_cards"];  
+    return Cards.find({_id : {$in: cardIds}});
   }
 });
 
@@ -40,7 +39,6 @@ Template.statistics.helpers({
       console.log("Error: user is " + user);
       return;
     }
-    console.log(user["statistics"]);
     return user["statistics"]["net_profit"];
   },
   getAudience : function(){
@@ -116,6 +114,10 @@ var updateElapsedTime = function(){
   Meteor.call('updateUserElapsedTime', getCurrentUser(), function(err, response){});
 };
 
+var updateVisibleCards = function(){
+  Meteor.call('updateUserVisibleCards', getCurrentUser(), function(err, response){});
+};
+
 var calculateAudience = function(){
   Meteor.call('updateUserAudience', getCurrentUser(), function(err, response){});
 };
@@ -134,6 +136,7 @@ var calculateNetProfit = function(){
 
 var gameLoop = function(){
   updateElapsedTime();
+  updateVisibleCards();
   calculateAudience();
   calculateServerCosts();
   calculateAdRevenue();
