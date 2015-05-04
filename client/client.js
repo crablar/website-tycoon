@@ -11,7 +11,7 @@ Template.list.helpers({
       return;
     }
     var cardIds = isListPublished ? user["published_cards"] : user["unpublished_cards"];  
-    return Cards.find({_id : {$in: cardIds}});
+    return Cards.find({_id : {$in: cardIds}}, {sort : {visible_after : -1}});
   }
 });
 
