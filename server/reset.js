@@ -184,7 +184,7 @@ if(deployedPrototype){
    	   	Cards.insert({
 	    	is_ad: false,
 	    	is_content: true,
-	    	summary: "",
+	    	summary: "Study shows giants may exist.",
 	        img_url: "",
 	        external_url: "",
 	        visible_after: 90
@@ -193,7 +193,7 @@ if(deployedPrototype){
 	   	Cards.insert({
 	    	is_ad: false,
 	    	is_content: true,
-	    	summary: "",
+	    	summary: "You won't believe what this cleric does next.",
 	        img_url: "",
 	        external_url: "",
 	        visible_after: 96
@@ -203,7 +203,7 @@ if(deployedPrototype){
 	   	Cards.insert({
 	    	is_ad: true,
 	    	is_content: false,
-	    	summary: "",
+	    	summary: "Olive Garden: July is marinara month",
 	        img_url: "",
 	        external_url: "",
 	        visible_after: 102
