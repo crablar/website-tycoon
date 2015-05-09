@@ -1,4 +1,11 @@
 <template name="card">
+	
+	    <a id="various1" href="#inline1" title="Put a title here">Name of Link Here</a>
+    <div style="display: none;">
+        <div id="inline1" style="width:400px;height:100px;overflow:auto;">
+                   blah {{ summary }}
+    </div> </div>
+
     <li id="{{ _id }}" class="card">
 		{{ summary }}
 		<img src="{{ img_url }}">

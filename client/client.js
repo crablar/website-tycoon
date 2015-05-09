@@ -2,7 +2,14 @@ Meteor.subscribe('cards');
 Meteor.subscribe('lists');
 Meteor.subscribe('statistics');
 Meteor.subscribe('users');
-
+  $(document).ready(function() {
+        $('#various1').fancybox(
+          {
+            'titlePosition'     : 'inside',
+            'transitionIn'      : 'none',
+            'transitionOut'     : 'none'
+          });
+    });
 Template.list.helpers({
   getCards : function(isListPublished) {
     user = getCurrentUser();
