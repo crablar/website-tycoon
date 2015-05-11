@@ -1,18 +1,26 @@
 <template name="card">
-	
-	    <a id="various1" href="#inline1" title="Put a title here">Name of Link Here</a>
-    <div style="display: none;">
-        <div id="inline1" style="width:400px;height:100px;overflow:auto;">
-                   blah {{ summary }}
-    </div> </div>
 
     <li id="{{ _id }}" class="card">
+		
 		{{ summary }}
-		<img src="{{ img_url }}">
+
+		<a id="lightbox-{{_id}}" href="#inline-summary-id-{{_id}}" alt="lightboxImage">
+			<img src="{{ img_url }}"/>
+		</a>
+		<div style="display: none;">
+        	<div id="inline-summary-id-{{_id}}" style="width:400px;height:100px;overflow:auto;">
+                   blah {{ summary }}
+    		</div> 
+		</div>
+
 		{{#if is_published}}
 			<input type="button" class="unpublish" value="Unpublish">
 		{{else}}
 			<input type="button" class="publish" value="Publish">
 		{{/if}}
+	    
 	    </li>
+
+	    {{activateLightbox}}
+
 </template>

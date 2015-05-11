@@ -2,14 +2,7 @@ Meteor.subscribe('cards');
 Meteor.subscribe('lists');
 Meteor.subscribe('statistics');
 Meteor.subscribe('users');
-  $(document).ready(function() {
-        $('#various1').fancybox(
-          {
-            'titlePosition'     : 'inside',
-            'transitionIn'      : 'none',
-            'transitionOut'     : 'none'
-          });
-    });
+
 Template.list.helpers({
   getCards : function(isListPublished) {
     user = getCurrentUser();
@@ -91,6 +84,20 @@ Template.card.events({
     Cards.update({_id : this._id}, {$set: {is_published : false}});
     Meteor.call('updateUserAfterPublicationChange', getCurrentUser()["_id"], 
       cardId, function(err, response){});  }
+});
+
+Template.card.helpers({
+  activateLightbox : function() {
+      var lightboxSelector = "#lightbox-" + this._id;
+      $(document).ready(function() {
+        $(lightboxSelector).fancybox(
+          {
+            'titlePosition'     : 'inside',
+            'transitionIn'      : 'none',
+            'transitionOut'     : 'none'
+          });
+    });
+  }
 });
 
 Template.login.helpers({
