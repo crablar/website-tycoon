@@ -1,3 +1,21 @@
+html {
+    width: 100%;
+    min-height: 100%;
+}
+body {
+    width: 100%;
+    min-height: 100%;
+    overflow: auto;
+    background: darkslategray;
+    color: white;
+}
+.login, h1 {
+    padding: 10px 25px 5px;
+}
+h1 {
+    text-transform: uppercase;
+    background: rgba(0, 115, 128, 0.5);
+}
 li {
     list-style: none;
     font-size: 16px;
@@ -20,16 +38,28 @@ h2 {
 .list {
     width: 300px ;
     float: left;
-    padding: 2px 8px ;
-    background-color: #ddd ;
+    padding: 0;
     margin: 30px ;
-    border: 1px solid #666 ;
-    border-radius: 7px ;
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    border-radius: none ;
+}
+.list ul {
+    background-color: rgba(173, 216, 230, 0.5);
+    margin: 0;
+    padding: 2px 8px;
+    padding-left: 25px;
+}
+.list h2 {
+    margin: 0;
+    padding: 2px 25px ;
+    text-transform: uppercase;
+    background-color: rgba(173, 216, 230, 0.5);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.75);
 }
 
 .card {
-    border-radius: 3px ;
-    border: 1px solid #666 ;
+    border-radius: 0px ;
+    border: 1px solid rgba(255, 255, 255, 0.75);
     margin: 5px ;
     padding: 4px ;
     word-wrap: break-word;
