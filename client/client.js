@@ -87,16 +87,12 @@ Template.card.events({
 });
 
 Template.card.helpers({
-  activateLightbox : function() {
-      var lightboxSelector = "#lightbox-" + this._id;
-      $(document).ready(function() {
-        $(lightboxSelector).fancybox(
-          {
-            'titlePosition'     : 'inside',
-            'transitionIn'      : 'none',
-            'transitionOut'     : 'none'
-          });
+  getStory : function(filename) {
+    console.log(filename);
+    Meteor.call('getStory', 'stories/' + filename, function(err, response){
+      Session.set(filename + "response", response);
     });
+    return Session.get(filename + "response");
   }
 });
 
