@@ -3,13 +3,13 @@
     <li id="{{ _id }}" class="card">
 	    
 		<!-- Button trigger modal -->
-		<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
+		<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#modal-{{_id}}">
 			<img src="{{ img_url }}"/>
 			{{headline}}
 		</button>
 
 		<!-- Modal -->
-		<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal fade" id="modal-{{_id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 		  <div class="modal-dialog">
 		    <div class="modal-content">
 		      <div class="modal-header">
@@ -17,7 +17,7 @@
 		        <h4 class="modal-title" id="myModalLabel">{{headline}}</h4>
 		      </div>
 		      <div class="modal-body">
-		        {{getStory storyFileName}}
+		        {{getStory story_file_name}}
 		      </div>
 		      <div class="modal-footer">
 		        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

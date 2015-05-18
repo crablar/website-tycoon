@@ -25,19 +25,21 @@ Template.statistics.helpers({
   initializeStatistics : function(){
     user = getCurrentUser();
     if(!user){
-      console.log("Error: user is " + user);
+      console.log("Error: user is not logged in.");
       return;
     }
-    if(user && !user["statistics"]){
-      console.log("initializing statistics");
+    if(!user["statistics"]){
       Meteor.call('initializeStatistics', user, function(err, response){});
     };
   },
   getProfit : function(){
     user = getCurrentUser();
-    if(!user || !user["statistics"]){
-      console.log("Error: user is " + user);
+    if(!user){
+      console.log("Error: user is not logged in.");
       return;
+    }
+    if(!user["statistics"]){
+      console.log("Error: user statistics not yet initialized");
     }
     return user["statistics"]["net_profit"];
   },
@@ -87,12 +89,11 @@ Template.card.events({
 });
 
 Template.card.helpers({
-  getStory : function(filename) {
-    console.log(filename);
-    Meteor.call('getStory', 'stories/' + filename, function(err, response){
-      Session.set(filename + "response", response);
+  getStory : function(storyFileName) {
+    Meteor.call('getStory', 'stories/' + this.story_file_name, function(err, response){
+      Session.set(storyFileName, response);
     });
-    return Session.get(filename + "response");
+    return Session.get(storyFileName);
   }
 });
 
