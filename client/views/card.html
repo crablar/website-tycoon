@@ -1,16 +1,30 @@
 <template name="card">
 
     <li id="{{ _id }}" class="card">
-		
-		{{ summary }}
-
-		<a id="lightbox-{{_id}}" href="#inline-summary-id-{{_id}}" alt="lightboxImage">
+	    
+		<!-- Button trigger modal -->
+		<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
 			<img src="{{ img_url }}"/>
-		</a>
-		<div style="display: none;">
-        	<div id="inline-summary-id-{{_id}}" style="width:400px;height:100px;overflow:auto;">
-                   blah {{ summary }}
-    		</div> 
+			{{summary}}
+		</button>
+
+		<!-- Modal -->
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		  <div class="modal-dialog">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		        <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+		      </div>
+		      <div class="modal-body">
+		        ...
+		      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		        <button type="button" class="btn btn-primary">Save changes</button>
+		      </div>
+		    </div>
+		  </div>
 		</div>
 
 		{{#if is_published}}
@@ -18,9 +32,8 @@
 		{{else}}
 			<input type="button" class="publish" value="Publish">
 		{{/if}}
-	    
-	    </li>
 
-	    {{activateLightbox}}
+    </li>
+
 
 </template>
