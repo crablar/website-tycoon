@@ -150,7 +150,6 @@ Meteor.startup(function(){
 
 Meteor.startup(function(){
 	if(resetEverything){	
-		Meteor.call('getStory', "stories/hello.txt");
 		Meteor.call('deleteEverything');
 		Meteor.call('seedDatabase');
 	}
